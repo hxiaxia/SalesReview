@@ -509,16 +509,34 @@ def run():
                                         if (feedItems.length > 0) {
                                             const headers = ['记录内容', '跟进类型', '客户', '项目', '日计划'];
                                             let rows = [];
+                                            const knownKeys = ['跟进类型', '客户', '项目', '日计划', '客户简称', '业务关联', '相关人', '拜访对象', '签到时间', '签到地点'];
+                                            
                                             for(let item of feedItems) {
                                                 const texts = item.innerText.split('\\n').map(t => t.trim()).filter(t => t.length > 0 && t !== '复制' && t !== '查看更多' && !t.includes('CRM('));
                                                 
-                                                let rowDict = {'记录内容': texts[0] || ''};
-                                                for(let i=0; i<texts.length-1; i++){
-                                                    const key = texts[i];
-                                                    if(['跟进类型', '客户', '项目', '日计划', '客户简称'].includes(key)) {
-                                                        const val = texts[i+1];
-                                                        rowDict[key] = val;
+                                                let rowDict = {};
+                                                let currentKey = '记录内容';
+                                                let contentLines = [];
+                                                
+                                                for(let i=0; i<texts.length; i++){
+                                                    const text = texts[i];
+                                                    if (knownKeys.includes(text)) {
+                                                        if (currentKey === '记录内容' && !rowDict['记录内容']) {
+                                                            rowDict['记录内容'] = contentLines.join(' ');
+                                                        }
+                                                        currentKey = text;
+                                                        if (i + 1 < texts.length && !knownKeys.includes(texts[i+1])) {
+                                                            rowDict[currentKey] = texts[i+1];
+                                                            i++; // Skip value line
+                                                        }
+                                                    } else {
+                                                        if (currentKey === '记录内容') {
+                                                            contentLines.push(text);
+                                                        }
                                                     }
+                                                }
+                                                if (currentKey === '记录内容' && !rowDict['记录内容']) {
+                                                    rowDict['记录内容'] = contentLines.join(' ');
                                                 }
                                                 
                                                 // 修复日计划可能粘连阅读数的bug
@@ -529,7 +547,7 @@ def run():
                                                 }
                                                 
                                                 rows.push([
-                                                    rowDict['记录内容'],
+                                                    rowDict['记录内容'] || '',
                                                     rowDict['跟进类型'] || '',
                                                     rowDict['客户'] || rowDict['客户简称'] || '',
                                                     rowDict['项目'] || '',
