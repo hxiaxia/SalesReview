@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+downloads/
+backup/
+reference_output/
+.env
+config.json
+.DS_Store
+.agents/
+report_dom.html
+debug_report.html
+*.pdf
+state.json

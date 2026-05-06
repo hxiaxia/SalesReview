@@ -1,0 +1,33 @@
+{
+    "username": "your_fxiaoke_username",
+    "password": "your_fxiaoke_password",
+    "login_url": "https://www.fxiaoke.com/proj/page/login",
+    "report_url": "https://www.fxiaoke.com/XV/Home/Index#paasapp/bi/list/=/appId_CRM",
+    "report_path": "数据分析 -> 报表 -> HAO-2026年大额开票机会统计",
+    "org_chart": {
+        "华东": {
+            "quota": 550,
+            "manager": {"name": "仇莉莉", "title": "片区经理"},
+            "subordinates": [
+                {"name": "李晓慧", "title": "客户经理", "quota": 150}
+            ]
+        },
+        "华南": {
+            "quota": 600,
+            "manager": {"name": "夏瑶", "title": "片区经理"},
+            "subordinates": []
+        },
+        "华北": {
+            "quota": 1000,
+            "manager": {"name": "苏颖琪", "title": "片区经理"},
+            "subordinates": [
+                {"name": "王佳", "title": "资深客户经理", "quota": 450},
+                {"name": "王钊立", "title": "客户经理", "quota": 150}
+            ]
+        },
+        "支持部门": {
+            "manager": {"name": "周鑫", "title": "运营经理"},
+            "subordinates": []
+        }
+    }
+}

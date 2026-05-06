@@ -1,0 +1,6 @@
+playwright
+pandas
+openpyxl
+google-genai
+markdown
+python-dotenv
