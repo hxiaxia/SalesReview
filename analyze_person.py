@@ -181,6 +181,7 @@ def call_gemini(prompt, task_name):
 # ==================== PDF 报告生成 ====================
 def generate_person_report_pdf(person_name, analysis, pdf_path):
     import markdown
+    import re
     
     today = datetime.now().strftime("%Y年%m月%d日")
     
