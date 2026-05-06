@@ -204,10 +204,25 @@ def generate_region_report_pdf(region_name, is_solo, analysis_1, analysis_2, ana
     today = datetime.now().strftime("%Y年%m月%d日")
     
     def md_to_html(md_text):
-        """使用 markdown 库转换为 HTML"""
-        md_text = re.sub(r'([^\n])\n(\s*\|.*\|.*)', r'\1\n\n\2', md_text)
-        md_text = re.sub(r'\n[ \t]+(\|[^\n]+\|)', r'\n\1', md_text)
-        return markdown.markdown(md_text, extensions=['tables'])
+        """使用 markdown 库转换为 HTML，自动修复无空行或带缩进的表格"""
+        lines = md_text.split('\\n')
+        fixed_lines = []
+        in_table = False
+        for line in lines:
+            stripped = line.strip()
+            is_table_row = stripped.startswith('|') and stripped.count('|') >= 2
+            
+            if is_table_row:
+                if not in_table:
+                    if fixed_lines and fixed_lines[-1].strip() != '':
+                        fixed_lines.append('')
+                    in_table = True
+                fixed_lines.append(line.lstrip(' \\t'))
+            else:
+                in_table = False
+                fixed_lines.append(line)
+                
+        return markdown.markdown('\\n'.join(fixed_lines), extensions=['tables'])
     
     # 根据模式调整章节标题
     if is_solo:
