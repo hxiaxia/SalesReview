@@ -179,7 +179,7 @@ def call_gemini(prompt, task_name):
         except Exception as e:
             err_str = str(e)
             print(f"   ❌ API 调用失败: {err_str}", flush=True)
-            if any(k.lower() in err_str.lower() for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected', 'timed out']):
+            if any(k.lower() in err_str.lower() for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected', 'timed out', 'FAILED_PRECONDITION', 'location is not supported']):
                 wait = 60 * (attempt + 1)
                 print(f"   ⏳ 触发自动重试机制，等待 {wait} 秒后重试 ({attempt+1}/3)...", flush=True)
                 time.sleep(wait)
