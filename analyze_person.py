@@ -167,7 +167,7 @@ def call_gemini(prompt, task_name):
     import time as _time
     for attempt in range(3):
         try:
-            client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1', 'timeout': 600.0})
+            client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1', 'timeout': 600000})
             print(f"\n🤖 正在请求 Gemini ({GEMINI_MODEL}) 分析: {task_name} ...", flush=True)
             response = client.models.generate_content(
                 model=GEMINI_MODEL,
