@@ -87,9 +87,15 @@ def read_excel_data(excel_path):
     headers = [cell.value for cell in main_sheet[1]]
     
     main_data = []
+    safe_to_original = {}
+    import re
     for row in main_sheet.iter_rows(min_row=2, values_only=True):
         record = dict(zip(headers, row))
         main_data.append(record)
+        # 建立 sheet name 映射表
+        orig_name = str(record.get('项目名称', '')).strip()
+        safe_name = re.sub(r'[\\\\*?:/\\[\\]]', '_', orig_name)[:31]
+        safe_to_original[safe_name] = orig_name
     
     # 2. 读取工作记录 sheets
     work_records = {}
@@ -100,8 +106,10 @@ def read_excel_data(excel_path):
             records = []
             for row in ws.iter_rows(min_row=2, values_only=True):
                 records.append(dict(zip(ws_headers, row)))
-            work_records[sheet_name] = records
-    
+            # 还原为原始项目名称，保证 AI 匹配一致性
+            orig_name = safe_to_original.get(sheet_name, sheet_name)
+            work_records[orig_name] = records
+            
     return headers, main_data, work_records
 
 
@@ -198,7 +206,7 @@ def call_gemini(prompt, task_name):
         except Exception as e:
             err_str = str(e)
             print(f"   ❌ API 调用失败: {err_str}")
-            if any(k in err_str for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy']):
+            if any(k in err_str for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected']):
                 wait = 60 * (attempt + 1)
                 print(f"   ⏳ 触发自动重试机制，等待 {wait} 秒后重试 ({attempt+1}/3)...")
                 _time.sleep(wait)
