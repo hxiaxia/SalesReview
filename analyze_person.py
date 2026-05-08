@@ -164,7 +164,7 @@ def format_work_records(work_records):
 
 # ==================== Gemini API 调用 ====================
 def call_gemini(prompt, task_name):
-    client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1', 'timeout': 300.0})
+    client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1', 'timeout': 600.0})
     for attempt in range(3):
         try:
             print(f"\n🤖 正在请求 Gemini ({GEMINI_MODEL}) 分析: {task_name} ...", flush=True)
@@ -178,7 +178,7 @@ def call_gemini(prompt, task_name):
         except Exception as e:
             err_str = str(e)
             print(f"   ❌ API 调用失败: {err_str}", flush=True)
-            if any(k in err_str for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected']):
+            if any(k.lower() in err_str.lower() for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected', 'timed out']):
                 wait = 60 * (attempt + 1)
                 print(f"   ⏳ 触发自动重试机制，等待 {wait} 秒后重试 ({attempt+1}/3)...", flush=True)
                 time.sleep(wait)
