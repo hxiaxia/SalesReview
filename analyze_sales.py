@@ -29,7 +29,7 @@ from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 load_dotenv()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = "gemini-2.5-flash-lite"
+GEMINI_MODEL = "gemini-2.5-pro"
    # 2026-03-12 验证通过的模型版本
 
 # 配置代理以防止国内直连报 "User location is not supported"
@@ -190,7 +190,7 @@ def call_gemini(prompt, task_name):
     
     client = genai.Client(
         api_key=GEMINI_API_KEY,
-        http_options={'api_version': 'v1'}
+        http_options={'api_version': 'v1', 'timeout': 300.0}
     )
     
     for attempt in range(3):

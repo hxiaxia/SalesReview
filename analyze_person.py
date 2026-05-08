@@ -26,7 +26,7 @@ from person_ai_prompts import build_person_prompt
 from dotenv import load_dotenv
 load_dotenv()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = "gemini-2.5-flash-lite"
+GEMINI_MODEL = "gemini-2.5-pro"
 os.environ["HTTP_PROXY"] = "http://127.0.0.1:7890"
 os.environ["HTTPS_PROXY"] = "http://127.0.0.1:7890"
 
@@ -164,7 +164,7 @@ def format_work_records(work_records):
 
 # ==================== Gemini API 调用 ====================
 def call_gemini(prompt, task_name):
-    client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1'})
+    client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1', 'timeout': 300.0})
     for attempt in range(3):
         try:
             print(f"\n🤖 正在请求 Gemini ({GEMINI_MODEL}) 分析: {task_name} ...", flush=True)
