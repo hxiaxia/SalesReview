@@ -30,7 +30,7 @@ from region_ai_prompts import (
 from dotenv import load_dotenv
 load_dotenv()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = "gemini-2.5-pro"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 os.environ["HTTP_PROXY"] = "http://127.0.0.1:7890"
 os.environ["HTTPS_PROXY"] = "http://127.0.0.1:7890"
@@ -176,6 +176,7 @@ def format_work_records(work_records):
 # ==================== Gemini API 调用 ====================
 def call_gemini(prompt, task_name):
     """调用 Gemini API（带自动重试）"""
+    import time
     for attempt in range(3):
         try:
             client = genai.Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1', 'timeout': 600000})
@@ -193,7 +194,7 @@ def call_gemini(prompt, task_name):
             if any(k.lower() in err_str.lower() for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected', 'timed out']):
                 wait = 60 * (attempt + 1)
                 print(f"   ⏳ 触发自动重试机制，等待 {wait} 秒后重试 ({attempt+1}/3)...", flush=True)
-                _time.sleep(wait)
+                time.sleep(wait)
             else:
                 raise
     

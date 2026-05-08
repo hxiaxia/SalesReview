@@ -29,7 +29,7 @@ from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 load_dotenv()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = "gemini-2.5-pro"
+GEMINI_MODEL = "gemini-2.5-flash"
    # 2026-03-12 验证通过的模型版本
 
 # 配置代理以防止国内直连报 "User location is not supported"
@@ -186,6 +186,7 @@ def get_region_text(main_data, REGION_MAP):
 # ==================== Gemini API 调用 ====================
 def call_gemini(prompt, task_name):
     """调用 Gemini API（新版 google-genai SDK，带自动重试）"""
+    import time
     for attempt in range(3):
         try:
             client = genai.Client(
@@ -206,7 +207,7 @@ def call_gemini(prompt, task_name):
             if any(k.lower() in err_str.lower() for k in ['429', 'RESOURCE_EXHAUSTED', 'quota', '503', 'UNAVAILABLE', 'high demand', 'SSL', 'EOF', 'ConnectError', 'Timeout', 'Connection', 'Proxy', 'RemoteProtocolError', 'disconnected', 'timed out']):
                 wait = 60 * (attempt + 1)
                 print(f"   ⏳ 触发自动重试机制，等待 {wait} 秒后重试 ({attempt+1}/3)...")
-                _time.sleep(wait)
+                time.sleep(wait)
             else:
                 raise
     
