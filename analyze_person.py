@@ -131,6 +131,7 @@ def filter_data_by_person(main_data, work_records, person_name):
 def format_main_table(headers, data):
     key_cols = ['客\n户名称', '项目名称', '负责人', '商机阶段', '预期阶段',
                 '项目金额', '预计开票日期', '预计开票金额']
+    amount_cols = {'项目金额', '预计开票金额', '预期阶段加权金额', '实际开票金额', '实际阶段加权金额'}
     # fallbacks
     available_cols = [c for c in key_cols if c in headers]
     if not available_cols:
@@ -145,8 +146,22 @@ def format_main_table(headers, data):
         vals = []
         for col in available_cols:
             v = record.get(col, '--')
-            v = str(v).replace('\n', ' ').strip() if v else '--'
-            vals.append(v)
+            col_clean = str(col).replace('\n', '')
+            if col_clean in amount_cols and v is not None and v != '--':
+                try:
+                    num = float(str(v).replace(',', '').replace('万', '').strip())
+                    if '万' in str(v):
+                        vals.append(f"{num:.2f}万")
+                    elif num > 100:
+                        vals.append(f"{num/10000:.2f}万")
+                    else:
+                        vals.append(f"{num:.2f}万")
+                except (ValueError, TypeError):
+                    v = str(v).replace('\n', ' ').strip() if v else '--'
+                    vals.append(v)
+            else:
+                v = str(v).replace('\n', ' ').strip() if v else '--'
+                vals.append(v)
         lines.append('| ' + ' | '.join(vals) + ' |')
     
     return '\n'.join(lines)

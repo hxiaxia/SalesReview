@@ -119,6 +119,9 @@ def format_main_table(headers, main_data):
     key_cols = ['客\n户名称', '项目名称', '负责人', '商机阶段', '预期阶段', 
                 '项目金额', '预计开票日期', '预计开票金额']
     
+    # 需要转换为万元的金额列
+    amount_cols = {'项目金额', '预计开票金额', '预期阶段加权金额', '实际开票金额', '实际阶段加权金额'}
+    
     # 找到实际存在的列
     available_cols = [c for c in key_cols if c in headers]
     if not available_cols:
@@ -135,8 +138,26 @@ def format_main_table(headers, main_data):
         vals = []
         for col in available_cols:
             v = record.get(col, '--')
-            v = str(v).replace('\n', ' ').strip() if v else '--'
-            vals.append(v)
+            col_clean = col.replace('\n', '')
+            # 金额列：纯数字转为万元
+            if col_clean in amount_cols and v is not None and v != '--':
+                try:
+                    num = float(str(v).replace(',', '').replace('万', '').strip())
+                    # 如果原始值已经带"万"字，说明已经是万元单位
+                    if '万' in str(v):
+                        vals.append(f"{num:.2f}万")
+                    elif num > 100:
+                        # 纯数字且大于100，认为是元，转换为万
+                        vals.append(f"{num/10000:.2f}万")
+                    else:
+                        # 小数字可能已经是万元
+                        vals.append(f"{num:.2f}万")
+                except (ValueError, TypeError):
+                    v = str(v).replace('\n', ' ').strip() if v else '--'
+                    vals.append(v)
+            else:
+                v = str(v).replace('\n', ' ').strip() if v else '--'
+                vals.append(v)
         lines.append('| ' + ' | '.join(vals) + ' |')
     
     return '\n'.join(lines)
