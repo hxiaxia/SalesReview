@@ -26,6 +26,13 @@ from region_ai_prompts import (
     build_region_prompt_3_solo,
 )
 
+
+def _format_wan(num):
+    """Format number in 万, removing unnecessary decimals"""
+    if num == int(num):
+        return f"{int(num)}万"
+    return f"{num:g}万"
+
 # ==================== 配置 (与 analyze_sales.py 保持一致) ====================
 from dotenv import load_dotenv
 load_dotenv()
@@ -159,11 +166,11 @@ def format_main_table(headers, data):
                 try:
                     num = float(str(v).replace(',', '').replace('万', '').strip())
                     if '万' in str(v):
-                        vals.append(f"{num:.2f}万")
+                        vals.append(_format_wan(num))
                     elif num > 100:
-                        vals.append(f"{num/10000:.2f}万")
+                        vals.append(_format_wan(num/10000))
                     else:
-                        vals.append(f"{num:.2f}万")
+                        vals.append(_format_wan(num))
                 except (ValueError, TypeError):
                     v = str(v).replace('\n', ' ').strip() if v else '--'
                     vals.append(v)
